@@ -4,6 +4,8 @@
 #include <fstream>
 #include <string>
 #include <omp.h>
+#include <cassert>
+#include <cctype>
 
 class Grid {
 private:
@@ -45,9 +47,10 @@ public:
     // System Simulation:
     void update_B() {
         // dB/dt = -curl( E )
-        for ( std::size_t z{}; z < Nz() - 1; ++z ) {
-            for ( std::size_t y{}; y < Ny() - 1; ++y ) {
-                for ( std::size_t x{}; x < Nx() - 1; ++x ) {
+        #pragma omp parallel for collapse(2)
+        for ( std::size_t z = 0; z < Nz() - 1; ++z ) {
+            for ( std::size_t y = 0; y < Ny() - 1; ++y ) {
+                for ( std::size_t x{0}; x < Nx() - 1; ++x ) {
                     // ∂Bx/∂t = -(∂Ez/∂y - ∂Ey/∂z)
                     Bx_[idx(x,y,z)] -= dt() * curl_X( Ey_[idx(x,y,z)], Ey_[idx(x,y,z+1)],
                                                       Ez_[idx(x,y,z)], Ez_[idx(x,y+1,z)] );
@@ -65,8 +68,9 @@ public:
     }
     void update_E() {
         // dE/dt = c*c * curl(B)
-        for ( std::size_t z{1}; z < Nz(); ++z ) {
-            for ( std::size_t y{1}; y < Ny(); ++y ) {
+        #pragma omp parallel for collapse(2)
+        for ( std::size_t z = 1; z < Nz(); ++z ) {
+            for ( std::size_t y = 1; y < Ny(); ++y ) {
                 for ( std::size_t x{1}; x < Nx(); ++x ) {
                     // ∂Ex/∂t = c*c * (∂Ez/∂y - ∂Ey/∂z)
                     Ex_[idx(x,y,z)] += dt() * c_sq() * curl_X( By_[idx(x,y,z-1)], By_[idx(x,y,z)],
@@ -107,6 +111,7 @@ public:
     }
 
     // Getters:
+    // Differentials
     double dx() const {
         return dx_;
     }
@@ -116,15 +121,17 @@ public:
     double dz() const {
         return dz_;
     }
+    double dt() const {
+        return dt_;
+    }
+    // Speed
     double c() const {
         return c_;
     }
     double c_sq() const {
         return c_*c_;
     }
-    double dt() const {
-        return dt_;
-    }
+    // Dimensions
     std::size_t Nx() const {
         return Nx_;
     }
@@ -134,8 +141,27 @@ public:
     std::size_t Nz() const {
         return Nz_;
     }
-    double get_Ez(std::size_t x, std::size_t y, std::size_t z) const {
-        return Ez_[idx(x,y,z)];
+    // Fields
+    double get_field( char const field,
+                      char const component,
+                      std::size_t const x,
+                      std::size_t const y,
+                      std::size_t const z ) const {
+        if ( std::tolower( field ) == 'e' ) {
+            switch ( std::tolower( component ) ) {
+                case 'x': return Ex_[idx(x,y,z)];
+                case 'y': return Ey_[idx(x,y,z)];
+                case 'z': return Ez_[idx(x,y,z)];
+            }
+        } else if ( std::tolower( field ) == 'b' ) {
+            switch ( std::tolower( component ) ) {
+                case 'x': return Bx_[idx(x,y,z)];
+                case 'y': return By_[idx(x,y,z)];
+                case 'z': return Bz_[idx(x,y,z)];
+            }
+        }
+        std::cout << "ERROR! CHECK PARAMETERS!" << std::endl;
+        return 0.0;
     }
 
     // Helpers:
@@ -180,10 +206,10 @@ int main() {
         ./main.exe
     */
 
-    Grid grid{ 10, 10, 3 };
+    Grid grid{ 50, 50, 5 };
 
     for ( int t{}; t <= 100; ++t ) {
-        grid.inject_source( 50, 50, 1, std::sin( 0.1 * t ) );
+        grid.inject_source( 5, 5, 1, std::sin( 0.1 * t ) );
         grid.step();
 
         if ( t % 10 == 0 ) {
