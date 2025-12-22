@@ -1,6 +1,9 @@
 #include <iostream>
 #include <memory>
 #include <cmath>
+#include <fstream>
+#include <string>
+#include <omp.h>
 
 class Grid {
 private:
@@ -13,7 +16,7 @@ private:
 
 public:
     // Constructor:
-    Grid( std::size_t new_Nx = 1, std::size_t new_Ny = 1, std::size_t new_Nz = 1,
+    Grid( std::size_t new_Nx = 5, std::size_t new_Ny = 5, std::size_t new_Nz = 5,
           double new_dx = 1.0, double new_dy = 1.0, double new_dz = 1.0,
           double new_c = 1.0 ):
     Nx_{ new_Nx }, Ny_{ new_Ny }, Nz_{ new_Nz },
@@ -21,7 +24,7 @@ public:
     c_{ new_c },
     dt_{ 0.99 / ( c() * std::sqrt( 1.0/(dx()*dx()) + 1.0/(dy()*dy()) + 1.0/(dz()*dz()) ) ) } {
         
-        int grid_size{ Nx_ * Ny_ * Nz_ };
+        std::size_t const grid_size{ Nx_ * Ny_ * Nz_ };
         Ex_ = std::make_unique<double[]>( grid_size );
         Ey_ = std::make_unique<double[]>( grid_size );
         Ez_ = std::make_unique<double[]>( grid_size );
@@ -67,15 +70,15 @@ public:
                 for ( std::size_t x{1}; x < Nx(); ++x ) {
                     // ∂Ex/∂t = c*c * (∂Ez/∂y - ∂Ey/∂z)
                     Ex_[idx(x,y,z)] += dt() * c_sq() * curl_X( By_[idx(x,y,z-1)], By_[idx(x,y,z)],
-                                                                Bz_[idx(x,y-1,z)], Bz_[idx(x,y,z)] );
+                                                               Bz_[idx(x,y-1,z)], Bz_[idx(x,y,z)] );
 
                     // ∂Ey/∂t = c*c * (∂Ex/∂z - ∂Ez/∂x)
                     Ey_[idx(x,y,z)] += dt() * c_sq() * curl_Y( Bx_[idx(x,y,z-1)], Bx_[idx(x,y,z)],
-                                                                Bz_[idx(x-1,y,z)], Bz_[idx(x,y,z)] );
+                                                               Bz_[idx(x-1,y,z)], Bz_[idx(x,y,z)] );
 
                     // ∂Ez/∂t = c*c * (∂Ex/∂y - ∂Ey/∂x)
                     Ez_[idx(x,y,z)] += dt() * c_sq() * curl_Z( By_[idx(x-1,y,z)], By_[idx(x,y,z)],
-                                                                Bx_[idx(x,y-1,z)], Bx_[idx(x,y,z)] );
+                                                               Bx_[idx(x,y-1,z)], Bx_[idx(x,y,z)] );
                 }
             }
         }
@@ -83,6 +86,24 @@ public:
     void step() {
         update_B();
         update_E();
+    }
+    void inject_source( std::size_t const x,
+                        std::size_t const y,
+                        std::size_t const z, 
+                        double const value ) {
+        Ez_[idx(x,y,z)] += value;
+    }
+    void output_slice( std::size_t const z, std::string const &file_name ) {
+        std::ofstream file( file_name );
+        for ( std::size_t y{}; y < Ny(); ++ y ) {
+            for ( std::size_t x{}; x< Nx(); ++x ) {
+                file << Ez_[idx(x,y,z)];
+                if ( x < Nx() - 1 ) {
+                    file << ",";
+                }
+            }
+            file << "\n";
+        }
     }
 
     // Getters:
@@ -112,6 +133,9 @@ public:
     }
     std::size_t Nz() const {
         return Nz_;
+    }
+    double get_Ez(std::size_t x, std::size_t y, std::size_t z) const {
+        return Ez_[idx(x,y,z)];
     }
 
     // Helpers:
@@ -144,6 +168,27 @@ public:
 };
 
 int main() {
+    /* 
+        To compile and run.
 
+        For No Parallel:
+        g++ -std=c++17 main.cpp -o main.exe
+
+        For Parallel:
+        g++ -std=c++17 main.cpp -o main.exe -fopenmp
+
+        ./main.exe
+    */
+
+    Grid grid{ 10, 10, 3 };
+
+    for ( int t{}; t <= 100; ++t ) {
+        grid.inject_source( 50, 50, 1, std::sin( 0.1 * t ) );
+        grid.step();
+
+        if ( t % 10 == 0 ) {
+            grid.output_slice(1, "output_" + std::to_string(t) + ".csv");
+        }
+    }
     return 0;
 }
