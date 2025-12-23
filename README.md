@@ -5,7 +5,6 @@ A high-performance Finite-Difference Time-Domain (FDTD) solver for Maxwell's equ
 ![C++](https://img.shields.io/badge/C++-17-blue?logo=c%2B%2B)
 ![OpenMP](https://img.shields.io/badge/OpenMP-Parallel-green)
 ![Python](https://img.shields.io/badge/Python-3.x-yellow?logo=python)
-![License](https://img.shields.io/badge/License-MIT-brightgreen)
 
 ## Overview
 
