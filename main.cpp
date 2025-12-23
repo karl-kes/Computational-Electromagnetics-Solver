@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cctype>
 #include <chrono>
+#include <filesystem>
 
 class Grid {
 private:
@@ -211,6 +212,7 @@ int main() {
         ./main.exe
     */
 
+    std::filesystem::create_directories("output");
     Grid grid{ 50, 50, 50 };
 
     auto start = std::chrono::high_resolution_clock::now();
