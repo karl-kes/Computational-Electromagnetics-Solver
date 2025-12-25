@@ -124,22 +124,31 @@ void Grid::magnitude_volume( std::string const &file_name, char const field ) {
     file.close();
 }
 void Grid::vector_volume( std::string const &file_name, char const field ) {
-    std::ofstream file( file_name );
+    // std::ofstream file( file_name );
     
-    for ( std::size_t z = 0; z < Nz(); ++z ) {
-        for ( std::size_t y = 0; y < Ny(); ++y ) {
-            for ( std::size_t x = 0; x < Nx(); ++x ) {
-                double Fx{ get_field( field, 'x', x, y, z ) };
-                double Fy{ get_field( field, 'y', x, y, z ) };
-                double Fz{ get_field( field, 'z', x, y, z ) };
-                double mag{ field_mag( field, x, y, z ) };
+    // for ( std::size_t z = 0; z < Nz(); ++z ) {
+    //     for ( std::size_t y = 0; y < Ny(); ++y ) {
+    //         for ( std::size_t x = 0; x < Nx(); ++x ) {
+    //             double Fx{ get_field( field, 'x', x, y, z ) };
+    //             double Fy{ get_field( field, 'y', x, y, z ) };
+    //             double Fz{ get_field( field, 'z', x, y, z ) };
+    //             double mag{ field_mag( field, x, y, z ) };
                 
-                file << x << "," << y << "," << z << ","
-                     << Fx << "," << Fy << "," << Fz << ","
-                     << mag << "\n";
-            }
-        }
-    }
+    //             file << x << "," << y << "," << z << ","
+    //                  << Fx << "," << Fy << "," << Fz << ","
+    //                  << mag << "\n";
+    //         }
+    //     }
+    // }
+
+    std::ofstream file( file_name );
+
+    // Header
+    uint64_t dimension[3]{ (uint64_t)Nx(), (uint64_t)Ny(), (uint64_t)Nz() };
+    file.write( reinterpret_cast<const char*>( dimension ), sizeof( dimension ) );
+
+    const std::size_t slice_size_bytes{ Nx() * Ny() * 4 * sizeof( double ) };
+    const std::size_t header_offset{ sizeof( dimension ) }; 
 }
 
 // Getters:

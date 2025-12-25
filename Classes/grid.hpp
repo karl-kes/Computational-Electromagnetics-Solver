@@ -7,6 +7,8 @@
 #include <cctype>
 #include <string>
 #include <omp.h>
+#include <vector>
+#include <cstdint>
 
 class Grid {
 private:

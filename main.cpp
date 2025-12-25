@@ -22,9 +22,9 @@ int main() {
     std::filesystem::remove_all("output");
     std::filesystem::create_directories("output");
 
-    int constexpr elapsed_time{ 1000 };
-    std::size_t constexpr Nx{ 10 }, Ny{ 10 }, Nz{ 10 };
-    double constexpr inject{ 10.0 };
+    static constexpr int elapsed_time{ 5000 };
+    static constexpr std::size_t Nx{ 20 }, Ny{ 20 }, Nz{ 20 };
+    static constexpr double inject{ 10.0 };
 
     Grid grid{ Nx, Ny, Nz };
 
