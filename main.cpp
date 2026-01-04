@@ -19,7 +19,7 @@ int main() {
     static constexpr int elapsed_time{ 1000 };
 
     static constexpr std::size_t Nx{ 10 }, Ny{ 10 }, Nz{ 10 };
-    static constexpr double inject{ 1000.0 };
+    static constexpr double inject{ 10.0 };
 
     static constexpr char B_field{ 'B' };
     static constexpr char E_field{ 'E' };
