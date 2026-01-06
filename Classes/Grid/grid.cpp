@@ -1,4 +1,5 @@
 #include "grid.hpp"
+#include "../../constant.hpp"
 
 // Constructor:
 Grid::Grid( std::size_t new_Nx, std::size_t new_Ny, std::size_t new_Nz,
@@ -8,7 +9,7 @@ Nx_{ new_Nx }, Ny_{ new_Ny }, Nz_{ new_Nz },
 dx_{ new_dx }, dy_{ new_dy }, dz_{ new_dz },
 eps_{ new_eps }, mu_{ new_mu },
 c_{ 1.0 / std::sqrt( mu() * eps() ) },
-dt_{ 0.02 / ( c() * std::sqrt( 1.0/(dx()*dx()) + 1.0/(dy()*dy()) + 1.0/(dz()*dz()) ) ) } {
+dt_{ constant::cfl_factor / ( c() * std::sqrt( 1.0/(dx()*dx()) + 1.0/(dy()*dy()) + 1.0/(dz()*dz()) ) ) } {
     
     std::size_t const grid_size{ Nx_ * Ny_ * Nz_ };
     Ex_ = std::make_unique<double[]>( grid_size );
@@ -110,32 +111,6 @@ void Grid::vector_volume( std::string const &file_name, char const field ) {
 }
 
 // Getters:
-// Differentials
-double Grid::dx() const {
-    return dx_;
-}
-double Grid::dy() const {
-    return dy_;
-}
-double Grid::dz() const {
-    return dz_;
-}
-double Grid::dt() const {
-    return dt_;
-}
-// Speed, Mu, Epsilon
-double Grid::c() const {
-    return c_;
-}
-double Grid::c_sq() const {
-    return c_*c_;
-}
-double Grid::eps() const {
-    return eps_;
-}
-double Grid::mu() const {
-    return mu_;
-}
 // Dimensions
 std::size_t Grid::Nx() const {
     return Nx_;
@@ -145,6 +120,33 @@ std::size_t Grid::Ny() const {
 }
 std::size_t Grid::Nz() const {
     return Nz_;
+}
+// Grid Size:
+double Grid::dx() const {
+    return dx_;
+}
+double Grid::dy() const {
+    return dy_;
+}
+double Grid::dz() const {
+    return dz_;
+}
+// Wave Constants:
+double Grid::eps() const {
+    return eps_;
+}
+double Grid::mu() const {
+    return mu_;
+}
+double Grid::c() const {
+    return c_;
+}
+double Grid::c_sq() const {
+    return c_*c_;
+}
+// Time Step:
+double Grid::dt() const {
+    return dt_;
 }
 // Fields
 double Grid::get_field( char const field,

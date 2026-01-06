@@ -55,10 +55,11 @@ int main() {
     max_energy_drift = ( 100.0 * ( max_energy_drift - initial_energy ) / initial_energy );
 
     // Output final metrics
+    std::cout << std::endl;
+    std::cout << "Duration of Simulation: " << duration.count() << " ms\n" << std::endl;
     std::cout << "Physical Time Simulated: " << constant::elapsed_time * grid.dt() << " s" << std::endl;
-    std::cout << "Duration of Simulation: " << duration.count() << " ms" << std::endl;
     std::cout << "Max Energy Drift: " << max_energy_drift << "%" << std::endl;
-    std::cout << "Max Magnetic Divergence: " << max_div_B << std::endl;
+    std::cout << "Max Magnetic Divergence: " << max_div_B << std::endl << std::endl;
 
     return 0;
 }
