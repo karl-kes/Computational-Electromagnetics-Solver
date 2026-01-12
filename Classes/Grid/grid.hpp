@@ -38,9 +38,14 @@ public:
                              std::size_t const y,
                              std::size_t const z, 
                              double const value );
-    void soft_source_inject();
-    void dipole_antenna_inject();
-    void gaussian_pulse_inject();
+    void soft_source_inject( double const injection, std::size_t const idx );
+    void dipole_antenna_inject( double const amp_one, double const amp_two,
+                                double const freq_one, double const freq_two,
+                                double const injection,
+                                std::size_t const x,
+                                std::size_t const y,
+                                std::size_t const z );
+    void gaussian_pulse_inject( double const injection, std::size_t const idx );
     void vector_volume( std::string const &file_name, char const field );
 
     // Getters:

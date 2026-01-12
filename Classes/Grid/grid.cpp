@@ -80,13 +80,24 @@ void Grid::hard_source_inject( std::size_t const x,
     Ey_[idx(x,y,z)] += value;
     Ez_[idx(x,y,z)] += value;
 }
-void Grid::soft_source_inject() {
+void Grid::soft_source_inject( double const injection, std::size_t const idx ) {
 
 }
-void Grid::dipole_antenna_inject() {
+void Grid::dipole_antenna_inject( double const amp_one, double const amp_two,
+                                  double const freq_one, double const freq_two,
+                                  double const injection,
+                                  std::size_t const x,
+                                  std::size_t const y,
+                                  std::size_t const z ) {
+    Ex_[idx(x,y,z)] += amp_one * std::sin( freq_one * injection );
+    Ey_[idx(x,y,z)] += amp_one * std::sin( freq_one * injection );
+    Ez_[idx(x,y,z)] += amp_one * std::sin( freq_one * injection );
 
+    Ex_[idx(Nx()-x,Ny()-y,Nz()-z)] += amp_two * std::sin( freq_two * injection );
+    Ey_[idx(Nx()-x,Ny()-y,Nz()-z)] += amp_two * std::sin( freq_two * injection );
+    Ez_[idx(Nx()-x,Ny()-y,Nz()-z)] += amp_two * std::sin( freq_two * injection );
 }
-void Grid::gaussian_pulse_inject() {
+void Grid::gaussian_pulse_inject( double const injection, std::size_t const idx ) {
 
 }
 void Grid::vector_volume( std::string const &file_name, char const field ) {

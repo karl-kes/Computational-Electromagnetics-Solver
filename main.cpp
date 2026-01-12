@@ -19,6 +19,10 @@ int main() {
     grid.create_directories();
 
     grid.hard_source_inject( constant::Nx/2, constant::Ny/2, constant::Nz/2, constant::inject );
+    grid.dipole_antenna_inject( constant::amp_one, constant::amp_two,
+                                constant::freq_one, constant::freq_two,
+                                constant::inject,
+                                constant::Nx/4, constant::Ny/4, constant::Nz/4 );
 
     double initial_energy{ grid.total_energy() };
     double max_energy_drift{ initial_energy };
