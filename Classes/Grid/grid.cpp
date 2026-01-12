@@ -72,23 +72,20 @@ void Grid::step() {
     update_B();
     update_E();
 }
-void Grid::hard_source_inject( std::size_t const x,
-                               std::size_t const y,
-                               std::size_t const z, 
-                               double const value ) {
+void Grid::hard_source_inject( double const value,
+                               std::size_t const x, std::size_t const y, std::size_t const z ) {
     Ex_[idx(x,y,z)] += value;
     Ey_[idx(x,y,z)] += value;
     Ez_[idx(x,y,z)] += value;
 }
-void Grid::soft_source_inject( double const injection, std::size_t const idx ) {
+void Grid::soft_source_inject( double const injection,
+                               std::size_t const x, std::size_t const y, std::size_t const z ) {
 
 }
 void Grid::dipole_antenna_inject( double const amp_one, double const amp_two,
                                   double const freq_one, double const freq_two,
                                   double const injection,
-                                  std::size_t const x,
-                                  std::size_t const y,
-                                  std::size_t const z ) {
+                                  std::size_t const x, std::size_t const y, std::size_t const z ) {
     Ex_[idx(x,y,z)] += amp_one * std::sin( freq_one * injection );
     Ey_[idx(x,y,z)] += amp_one * std::sin( freq_one * injection );
     Ez_[idx(x,y,z)] += amp_one * std::sin( freq_one * injection );
@@ -97,7 +94,8 @@ void Grid::dipole_antenna_inject( double const amp_one, double const amp_two,
     Ey_[idx(Nx()-x,Ny()-y,Nz()-z)] += amp_two * std::sin( freq_two * injection );
     Ez_[idx(Nx()-x,Ny()-y,Nz()-z)] += amp_two * std::sin( freq_two * injection );
 }
-void Grid::gaussian_pulse_inject( double const injection, std::size_t const idx ) {
+void Grid::gaussian_pulse_inject( double const injection,
+                                  std::size_t const x, std::size_t const y, std::size_t const z ) {
 
 }
 void Grid::vector_volume( std::string const &file_name, char const field ) {
@@ -170,31 +168,21 @@ double Grid::dt() const {
 // Fields
 double Grid::get_field( char const field,
                         char const component,
-                        std::size_t const x,
-                        std::size_t const y,
-                        std::size_t const z ) const {
-    std::size_t index{ idx(x,y,z) };
-
-    if ( std::tolower( field ) == 'e' ) {
-        switch ( std::tolower( component ) ) {
-            case 'x': return Ex_[index];
-            case 'y': return Ey_[index];
-            case 'z': return Ez_[index];
-        }
-    } else if ( std::tolower( field ) == 'b' ) {
-        switch ( std::tolower( component ) ) {
-            case 'x': return Bx_[index];
-            case 'y': return By_[index];
-            case 'z': return Bz_[index];
-        }
+                        std::size_t const x, std::size_t const y, std::size_t const z ) const {
+    if ( field == 'e' ) {
+        if ( component == 'x' ) return Ex_[idx(x,y,z)];
+        else if ( component == 'y' ) return Ey_[idx(x,y,z)];
+        else if ( component == 'z' ) return Ez_[idx(x,y,z)];
+    } else if ( field == 'b' ) {
+        if ( component == 'x' ) return Bx_[idx(x,y,z)];
+        else if ( component == 'y' ) return By_[idx(x,y,z)];
+        else if ( component == 'z' ) return Bz_[idx(x,y,z)];
     }
-    std::cout << "ERROR! CHECK PARAMETERS!" << std::endl;
-    return 0.0;
+    throw std::invalid_argument{ "ERROR! CHECK PARAMETERS!" };
+    return -1.0;
 }
 double Grid::field_mag( char const field,
-                        std::size_t const x,
-                        std::size_t const y,
-                        std::size_t const z ) const {
+                        std::size_t const x, std::size_t const y, std::size_t const z ) const {
     double Fx{ get_field( field, 'x', x, y, z ) };
     double Fy{ get_field( field, 'y', x, y, z ) };
     double Fz{ get_field( field, 'z', x, y, z ) };
@@ -208,13 +196,11 @@ void Grid::print_progress( int curr_time, int total_time ) const {
     std::cout << "\rProgress: " << percent << "%" << std::flush;
     
     if ( curr_time == total_time ) {
-        std::cout << std::endl;  // New line when done
+        std::cout << std::endl;
     }
 }
 // Finds 3D index
-std::size_t Grid::idx( std::size_t const x,
-                       std::size_t const y,
-                       std::size_t const z ) const {
+std::size_t Grid::idx( std::size_t const x, std::size_t const y, std::size_t const z ) const {
     return x + Nx() * ( y + Ny() * z );
 }
 // Curls in X, Y, Z

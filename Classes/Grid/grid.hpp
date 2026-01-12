@@ -26,7 +26,7 @@ private:
 
 public:
     // Constructor:
-    Grid( std::size_t new_Nx = 10, std::size_t new_Ny = 10, std::size_t new_Nz = 10,
+    Grid( std::size_t new_Nx = 12, std::size_t new_Ny = 12, std::size_t new_Nz = 12,
           double new_dx = 5.0, double new_dy = 5.0, double new_dz = 5.0,
           double new_eps = 1.0, double new_mu = 1.0 );
 
@@ -34,18 +34,20 @@ public:
     void update_B();
     void update_E();
     void step();
-    void hard_source_inject( std::size_t const x,
-                             std::size_t const y,
-                             std::size_t const z, 
-                             double const value );
-    void soft_source_inject( double const injection, std::size_t const idx );
+    void hard_source_inject( double const value,
+                             std::size_t const x, std::size_t const y, std::size_t const z );
+
+    void soft_source_inject( double const injection, std::size_t const x,
+                             std::size_t const y, std::size_t const z );
+
     void dipole_antenna_inject( double const amp_one, double const amp_two,
                                 double const freq_one, double const freq_two,
                                 double const injection,
-                                std::size_t const x,
-                                std::size_t const y,
-                                std::size_t const z );
-    void gaussian_pulse_inject( double const injection, std::size_t const idx );
+                                std::size_t const x, std::size_t const y, std::size_t const z );
+
+    void gaussian_pulse_inject( double const injection,
+                                std::size_t const x, std::size_t const y, std::size_t const z );
+
     void vector_volume( std::string const &file_name, char const field );
 
     // Getters:
@@ -70,16 +72,12 @@ public:
                       std::size_t const y,
                       std::size_t const z ) const;
     double field_mag( char const field,
-                      std::size_t const x,
-                      std::size_t const y,
-                      std::size_t const z ) const;
+                      std::size_t const x, std::size_t const y, std::size_t const z ) const;
 
     // Helpers:
     void print_progress( int curr_time, int total_time ) const;
     // Finds 3D index
-    std::size_t idx( std::size_t const x,
-                     std::size_t const y,
-                     std::size_t const z ) const;
+    std::size_t idx( std::size_t const x, std::size_t const y, std::size_t const z ) const;
     // Curls in X, Y, Z
     double curl_x( double const Y_0, double const Y_1,
                    double const Z_0, double const Z_1 ) const;

@@ -15,10 +15,14 @@
 */
 
 int main() {
-    Grid grid{ constant::Nx+1, constant::Ny+1, constant::Nz+1 };
+    Grid grid{ constant::Nx+1, constant::Ny+1, constant::Nz+1,
+               constant::dx, constant::dy, constant::dz,
+               constant::eps, constant::mu };
     grid.create_directories();
 
-    grid.hard_source_inject( constant::Nx/2, constant::Ny/2, constant::Nz/2, constant::inject );
+    grid.hard_source_inject( constant::inject,
+                             constant::Nx/2, constant::Ny/2, constant::Nz/2 );
+
     grid.dipole_antenna_inject( constant::amp_one, constant::amp_two,
                                 constant::freq_one, constant::freq_two,
                                 constant::inject,
@@ -28,13 +32,13 @@ int main() {
     double max_energy_drift{ initial_energy };
 
     auto start{ std::chrono::high_resolution_clock::now() };
-    for ( int curr_time{}; curr_time <= constant::elapsed_time; ++curr_time ) {
+    for ( std::size_t curr_time{}; curr_time <= constant::total_time; ++curr_time ) {
         grid.step();
 
         max_energy_drift = std::max( grid.total_energy(), max_energy_drift );
 
         if ( curr_time % 10 == 0 ) {
-            grid.print_progress( curr_time, constant::elapsed_time );
+            grid.print_progress( curr_time, constant::total_time );
             std::string t_sec{ std::to_string( curr_time ) };
             grid.vector_volume( "output/E/E" + t_sec + ".bin", constant::E_field );
             grid.vector_volume( "output/B/B" + t_sec + ".bin", constant::B_field );
@@ -46,9 +50,9 @@ int main() {
     max_energy_drift = ( 100.0 * ( max_energy_drift - initial_energy ) / initial_energy );
 
     std::cout << std::endl;
-    std::cout << "Duration of Simulation: " << duration.count() << " ms\n" << std::endl;
-    std::cout << "Physical Time Simulated: " << constant::elapsed_time * grid.dt() << " s" << std::endl;
-    std::cout << "Max Energy Drift: " << max_energy_drift << "%" << std::endl;
+    std::cout << "Duration of Simulation: " << duration.count() << " ms" << std::endl;
+    std::cout << "Physical Time Simulated: " << constant::total_time * grid.dt() << " s" << std::endl;
+    std::cout << "Max Energy Drift: " << max_energy_drift << "%\n" << std::endl;
 
     return 0;
 }
