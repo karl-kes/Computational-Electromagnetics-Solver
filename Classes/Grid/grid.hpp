@@ -21,7 +21,7 @@ private:
     double eps_, mu_;
 
     // Derived Constants:
-    double c_, dt_;
+    double c_, c_sq_, dt_;
 
     // Field Components:
     std::unique_ptr<double[]> Ex_, Ey_, Ez_;
@@ -74,10 +74,18 @@ public:
     double field_magnitude( char field,
                             std::size_t x, std::size_t y, std::size_t z ) const;
 
-    // Current Access:
-    double &Jx( std::size_t x, std::size_t y, std::size_t z );
-    double &Jy( std::size_t x, std::size_t y, std::size_t z );
-    double &Jz( std::size_t x, std::size_t y, std::size_t z );
+    // Electric, Magnetic, Current Access:
+    double &Ex( std::size_t x, std::size_t y, std::size_t z ) const;
+    double &Ey( std::size_t x, std::size_t y, std::size_t z ) const;
+    double &Ez( std::size_t x, std::size_t y, std::size_t z ) const;
+
+    double &Bx( std::size_t x, std::size_t y, std::size_t z ) const;
+    double &By( std::size_t x, std::size_t y, std::size_t z ) const;
+    double &Bz( std::size_t x, std::size_t y, std::size_t z ) const;
+
+    double &Jx( std::size_t x, std::size_t y, std::size_t z ) const;
+    double &Jy( std::size_t x, std::size_t y, std::size_t z ) const;
+    double &Jz( std::size_t x, std::size_t y, std::size_t z ) const;
 
     // Getters:
     std::size_t Nx() const;

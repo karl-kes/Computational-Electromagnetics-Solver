@@ -28,54 +28,6 @@ double Grid::curl_z( double const Y_0, double const Y_1,
     return ( dYdX - dXdY );
 }
 
-double Grid::field( char field, char component, 
-                    std::size_t x, std::size_t y, std::size_t z ) const {
-    std::size_t i{ idx(x, y, z) };
-    
-    if ( field == 'e' ) {
-        switch ( component ) {
-            case 'x': return Ex_[i];
-            case 'y': return Ey_[i];
-            case 'z': return Ez_[i];
-        }
-    } else if ( field == 'b' ) {
-        switch ( component ) {
-            case 'x': return Bx_[i];
-            case 'y': return By_[i];
-            case 'z': return Bz_[i];
-        }
-    }
-    throw std::invalid_argument("Invalid field or component specifier");
-}
-
-double &Grid::field( char field, char component,
-                     std::size_t x, std::size_t y, std::size_t z ) {
-    std::size_t i{ idx(x, y, z) };
-    
-    if ( field == 'e' ) {
-        switch ( component ) {
-            case 'x': return Ex_[i];
-            case 'y': return Ey_[i];
-            case 'z': return Ez_[i];
-        }
-    } else if ( field == 'b' ) {
-        switch ( component ) {
-            case 'x': return Bx_[i];
-            case 'y': return By_[i];
-            case 'z': return Bz_[i];
-        }
-    }
-    throw std::invalid_argument("Invalid field or component specifier");
-}
-
-double Grid::field_magnitude(char field, std::size_t x, std::size_t y, std::size_t z) const {
-    double Fx{ this->field( field, 'x', x, y, z ) };
-    double Fy{ this->field( field, 'y', x, y, z ) };
-    double Fz{ this->field( field, 'z', x, y, z ) };
-
-    return std::sqrt( Fx*Fx + Fy*Fy + Fz*Fz );
-}
-
 double Grid::total_energy() const {
     double energy{};
     double dV{ dx() * dy() * dz() };
@@ -85,10 +37,8 @@ double Grid::total_energy() const {
         for ( std::size_t y = 0; y < Ny(); ++y ) {
             #pragma omp simd
             for ( std::size_t x = 0; x < Nx(); ++x ) {
-                std::size_t i = idx(x,y,z);
-
-                double E_sq{ Ex_[i]*Ex_[i] + Ey_[i]*Ey_[i] + Ez_[i]*Ez_[i] };
-                double B_sq{ Bx_[i]*Bx_[i] + By_[i]*By_[i] + Bz_[i]*Bz_[i] };
+                double E_sq{ Ex(x,y,z)*Ex(x,y,z) + Ey(x,y,z)*Ey(x,y,z) + Ez(x,y,z)*Ez(x,y,z) };
+                double B_sq{ Bx(x,y,z)*Bx(x,y,z) + By(x,y,z)*By(x,y,z) + Bz(x,y,z)*Bz(x,y,z) };
 
                 energy += 0.5 * ( eps() * E_sq + B_sq / mu() );
             }

@@ -41,7 +41,7 @@ double Grid::c() const {
 }
 
 double Grid::c_sq() const {
-    return c_*c_;
+    return c_sq_;
 }
 
 // Time Step:
@@ -49,14 +49,38 @@ double Grid::dt() const {
     return dt_;
 }
 
-double &Grid::Jx( std::size_t x, std::size_t y, std::size_t z ) {
-    return Jx_[idx(x, y, z)];
+double &Grid::Ex( std::size_t x, std::size_t y, std::size_t z ) const {
+    return Ex_[idx(x,y,z)];
 }
 
-double &Grid::Jy( std::size_t x, std::size_t y, std::size_t z ) {
-    return Jy_[idx(x, y, z)];
+double &Grid::Ey( std::size_t x, std::size_t y, std::size_t z ) const {
+    return Ey_[idx(x,y,z)];
 }
 
-double &Grid::Jz( std::size_t x, std::size_t y, std::size_t z ) {
-    return Jz_[idx(x, y, z)];
+double &Grid::Ez( std::size_t x, std::size_t y, std::size_t z ) const {
+    return Ez_[idx(x,y,z)];
+}
+
+double &Grid::Bx( std::size_t x, std::size_t y, std::size_t z ) const {
+    return Bx_[idx(x,y,z)];
+}
+
+double &Grid::By( std::size_t x, std::size_t y, std::size_t z ) const {
+    return By_[idx(x,y,z)];
+}
+
+double &Grid::Bz( std::size_t x, std::size_t y, std::size_t z ) const {
+    return Bz_[idx(x,y,z)];
+}
+
+double &Grid::Jx( std::size_t x, std::size_t y, std::size_t z ) const {
+    return Jx_[idx(x,y,z)];
+}
+
+double &Grid::Jy( std::size_t x, std::size_t y, std::size_t z ) const {
+    return Jy_[idx(x,y,z)];
+}
+
+double &Grid::Jz( std::size_t x, std::size_t y, std::size_t z ) const {
+    return Jz_[idx(x,y,z)];
 }

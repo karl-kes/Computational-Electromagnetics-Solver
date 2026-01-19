@@ -4,7 +4,7 @@ Grid::Grid( Simulation_Config const &config ):
 Nx_{ config.Nx + 1 }, Ny_{ config.Ny + 1 }, Nz_{ config.Nz + 1 },
 dx_{ config.dx }, dy_{ config.dy }, dz_{ config.dz },
 eps_{ config.eps }, mu_{ config.mu },
-c_{ config.c }, dt_{ config.dt } {
+c_{ config.c }, c_sq_{ config.c * config.c }, dt_{ config.dt } {
     Ex_ = std::make_unique<double[]>( config.size );
     Ey_ = std::make_unique<double[]>( config.size );
     Ez_ = std::make_unique<double[]>( config.size );
