@@ -19,17 +19,18 @@ void Grid::update_B() {
             #pragma omp simd
             for ( std::size_t x = 0; x < Nx() - 1; ++x ) {
                 // Take curl of components and apply B -= ∂B:
+                double const curl_x_E{ curl_x( Ey(x,y,z), Ey(x,y,z+1), Ez(x,y,z), Ez(x,y+1,z) ) };
+                double const curl_y_E{ curl_y( Ex(x,y,z), Ex(x,y,z+1), Ez(x,y,z), Ez(x+1,y,z) ) };
+                double const curl_z_E{ curl_z( Ey(x,y,z), Ey(x+1,y,z), Ex(x,y,z), Ex(x,y+1,z) ) };
+
                 // ∂B_x = ∂t * curl_x( E )
-                Bx(x,y,z) -= dt() * curl_x( Ey(x,y,z), Ey(x,y,z+1),
-                                            Ez(x,y,z), Ez(x,y+1,z) );
+                Bx(x,y,z) -= dt() * curl_x_E;
 
                 // ∂B_y = ∂t * curl_y( E )
-                By(x,y,z) -= dt() * curl_y( Ex(x,y,z), Ex(x,y,z+1),
-                                            Ez(x,y,z), Ez(x+1,y,z) );
+                By(x,y,z) -= dt() * curl_y_E;
 
                 // ∂B_z = ∂t * curl_z( E )
-                Bz(x,y,z) -= dt() * curl_z( Ey(x,y,z), Ey(x+1,y,z),
-                                            Ex(x,y,z), Ex(x,y+1,z) );
+                Bz(x,y,z) -= dt() * curl_z_E;
             }
         }
     }
@@ -44,29 +45,22 @@ void Grid::update_E() {
             #pragma omp simd
             for ( std::size_t x = 1; x < Nx(); ++x ) {
                 // Curl of components and apply E += ∂E:
+                double const curl_x_B{ curl_x( By(x,y,z-1), By(x,y,z), Bz(x,y-1,z), Bz(x,y,z) ) };
+                double const curl_y_B{ curl_y( Bx(x,y,z-1), Bx(x,y,z), Bz(x-1,y,z), Bz(x,y,z) ) };
+                double const curl_z_B{ curl_z( By(x-1,y,z), By(x,y,z), Bx(x,y-1,z), Bx(x,y,z) ) };
+
+                double const jx_term{ Jx(x,y,z) / eps() };
+                double const jy_term{ Jy(x,y,z) / eps() };
+                double const jz_term{ Jz(x,y,z) / eps() };
+
                 // ∂E_x = ∂t * c*c * (∂E_z/∂y - ∂E_y/∂z)
-                Ex(x,y,z) += dt() * (
-                                      c_sq() *
-                                      curl_x( By(x,y,z-1), By(x,y,z),
-                                              Bz(x,y-1,z), Bz(x,y,z) ) -
-                                      Jx(x,y,z) / eps()
-                                    );
+                Ex(x,y,z) += dt() * ( c_sq() * curl_x_B - jx_term );
 
                 // ∂E_y = ∂t * c*c * (∂Ex/∂z - ∂Ez/∂x)
-                Ey(x,y,z) += dt() * (
-                                      c_sq() *
-                                      curl_y( Bx(x,y,z-1), Bx(x,y,z),
-                                              Bz(x-1,y,z), Bz(x,y,z) ) -
-                                      Jy(x,y,z) / eps()
-                                    );
+                Ey(x,y,z) += dt() * ( c_sq() * curl_y_B - jy_term );
 
                 // ∂E_z = ∂t * c*c * (∂Ex/∂y - ∂Ey/∂x)
-                Ez(x,y,z) += dt() * (
-                                      c_sq() *
-                                      curl_z( By(x-1,y,z), By(x,y,z),
-                                              Bx(x,y-1,z), Bx(x,y,z) ) -
-                                      Jz(x,y,z) / eps()
-                                    );
+                Ez(x,y,z) += dt() * ( c_sq() * curl_z_B - jz_term );
             }
         }
     }
@@ -77,8 +71,9 @@ void Grid::step() {
     update_E();
 }
 
-double Grid::field( char field, char component, 
-                    std::size_t x, std::size_t y, std::size_t z ) const {
+double Grid::field(
+    char field, char component, 
+    std::size_t x, std::size_t y, std::size_t z ) const {
     if ( field == 'e' ) {
         switch ( component ) {
             case 'x': return Ex(x,y,z);
@@ -95,8 +90,12 @@ double Grid::field( char field, char component,
     throw std::invalid_argument{ "Invalid field or component specifier" };
 }
 
-double &Grid::field( char field, char component,
-                     std::size_t x, std::size_t y, std::size_t z ) {
+double &Grid::field(
+    char field,
+    char component,
+    std::size_t x,
+    std::size_t y,
+    std::size_t z ) {
     if ( field == 'e' ) {
         switch ( component ) {
             case 'x': return Ex(x,y,z);

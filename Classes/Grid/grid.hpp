@@ -33,17 +33,21 @@ private:
 
     // Private Methods:
     // Finds flattened 1D index given 3D space:
-    std::size_t idx( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] std::size_t idx( std::size_t x, std::size_t y, std::size_t z ) const;
 
     // Curl Calculation:
-    double curl_x( double Y_0, double Y_1,
-                   double Z_0, double Z_1) const;
+    // Calculation flipped to fix Plotly left-hand rule default.
+    [[nodiscard]] double curl_x(
+                         double Y_0, double Y_1,
+                         double Z_0, double Z_1) const;
 
-    double curl_y( double X_0, double X_1,
-                   double Z_0, double Z_1 ) const;
+    [[nodiscard]] double curl_y(
+                         double X_0, double X_1,
+                         double Z_0, double Z_1 ) const;
 
-    double curl_z( double Y_0, double Y_1,
-                   double X_0, double X_1 ) const;
+    [[nodiscard]] double curl_z(
+                         double Y_0, double Y_1,
+                         double X_0, double X_1 ) const;
 
     // Field Updates:
     void update_B();
@@ -65,44 +69,60 @@ public:
     void add_source( std::unique_ptr<Source> source );
 
     // Field Access:
-    double field( char field, char component,
-                  std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] double field(
+                         char field, char component,
+                         std::size_t x, std::size_t y, std::size_t z ) const;
 
-    double &field( char field, char component,
+    [[nodiscard]] double &field( char field, char component,
                    std::size_t x, std::size_t y, std::size_t z );
 
-    double field_magnitude( char field,
-                            std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] double field_magnitude(
+                         char field,
+                         std::size_t x, std::size_t y, std::size_t z ) const;
 
     // Electric, Magnetic, Current Access:
-    double &Ex( std::size_t x, std::size_t y, std::size_t z ) const;
-    double &Ey( std::size_t x, std::size_t y, std::size_t z ) const;
-    double &Ez( std::size_t x, std::size_t y, std::size_t z ) const;
+    // Read only:
+    [[nodiscard]] const double &Ex( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] const double &Ey( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] const double &Ez( std::size_t x, std::size_t y, std::size_t z ) const;
 
-    double &Bx( std::size_t x, std::size_t y, std::size_t z ) const;
-    double &By( std::size_t x, std::size_t y, std::size_t z ) const;
-    double &Bz( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] const double &Bx( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] const double &By( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] const double &Bz( std::size_t x, std::size_t y, std::size_t z ) const;
 
-    double &Jx( std::size_t x, std::size_t y, std::size_t z ) const;
-    double &Jy( std::size_t x, std::size_t y, std::size_t z ) const;
-    double &Jz( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] const double &Jx( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] const double &Jy( std::size_t x, std::size_t y, std::size_t z ) const;
+    [[nodiscard]] const double &Jz( std::size_t x, std::size_t y, std::size_t z ) const;
+
+    // Writable:
+    double &Ex( std::size_t x, std::size_t y, std::size_t z );
+    double &Ey( std::size_t x, std::size_t y, std::size_t z );
+    double &Ez( std::size_t x, std::size_t y, std::size_t z );
+
+    double &Bx( std::size_t x, std::size_t y, std::size_t z );
+    double &By( std::size_t x, std::size_t y, std::size_t z );
+    double &Bz( std::size_t x, std::size_t y, std::size_t z );
+
+    double &Jx( std::size_t x, std::size_t y, std::size_t z );
+    double &Jy( std::size_t x, std::size_t y, std::size_t z );
+    double &Jz( std::size_t x, std::size_t y, std::size_t z );
 
     // Getters:
-    std::size_t Nx() const;
-    std::size_t Ny() const;
-    std::size_t Nz() const;
+    [[nodiscard]] std::size_t Nx() const;
+    [[nodiscard]] std::size_t Ny() const;
+    [[nodiscard]] std::size_t Nz() const;
 
-    double dx() const;
-    double dy() const;
-    double dz() const;
+    [[nodiscard]] double dx() const;
+    [[nodiscard]] double dy() const;
+    [[nodiscard]] double dz() const;
 
-    double eps() const;
-    double mu() const;
+    [[nodiscard]] double eps() const;
+    [[nodiscard]] double mu() const;
 
-    double c() const;
-    double c_sq() const;
-    double dt() const;
+    [[nodiscard]] double c() const;
+    [[nodiscard]] double c_sq() const;
+    [[nodiscard]] double dt() const;
 
     // Diagnostics:
-    double total_energy() const;
+    [[nodiscard]] double total_energy() const;
 };

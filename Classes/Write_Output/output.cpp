@@ -7,12 +7,12 @@ void Output::initialize() const {
     std::filesystem::create_directories( base_path_ + "/B" );
 }
 
-std::string Output::file_name ( Field_Type field, std::size_t time_step ) const {
-    std::string prefix{ ( field == Field_Type::electric ) ? "/E/E" : "/B/B" };
+std::string Output::file_name ( Field field, std::size_t time_step ) const {
+    std::string prefix{ ( field == Field::ELECTRIC ) ? "/E/E" : "/B/B" };
     return base_path_ + prefix + std::to_string( time_step ) + ".bin";
 }
 
-void Output::write_field( Grid const& grid, Field_Type field, double time_step ) const {
+void Output::write_field( Grid const& grid, Field field, double time_step ) const {
     std::string path{ file_name( field, time_step ) };
     std::ofstream file( path, std::ios::binary | std::ios::out );
     
@@ -31,7 +31,7 @@ void Output::write_field( Grid const& grid, Field_Type field, double time_step )
     };
     file.write( reinterpret_cast<char const*>( dimensions ), sizeof( dimensions ) );
 
-    char field_char{ ( field == Field_Type::electric ) ? 'e' : 'b' };
+    char field_char{ ( field == Field::ELECTRIC ) ? 'e' : 'b' };
 
     std::vector<double> buffer;
     buffer.reserve( nx * ny * 4 );
