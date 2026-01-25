@@ -5,7 +5,7 @@ void Grid::add_source( std::unique_ptr<Source> source ) {
 }
 
 void Grid::apply_sources( double time_step ) {
-    for ( auto& source : sources_ ) {
+    for ( auto const &source : sources_ ) {
         source->apply( *this, time_step );
     }
 }
@@ -97,8 +97,6 @@ double Grid::field( char field, char component,
 
 double &Grid::field( char field, char component,
                      std::size_t x, std::size_t y, std::size_t z ) {
-    std::size_t i{ idx(x, y, z) };
-    
     if ( field == 'e' ) {
         switch ( component ) {
             case 'x': return Ex(x,y,z);

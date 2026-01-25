@@ -1,6 +1,6 @@
-# 3D Finite-Difference Time-Domain Maxwell Solver
+# Computational Electromagnetics Solver
 
-A high-performance Finite-Difference Time-Domain (FDTD) solver for Maxwell's equations in 3D, implemented in C++ with OpenMP parallelization and interactive Plotly visualization.
+A high-performance Finite-Difference Time-Domain solver which simulates Maxwell's equations in 3D. Implemented in C++ with OpenMP parallelization and interactive Plotly visualization.
 
 ![C++](https://img.shields.io/badge/C++-17-blue?logo=c%2B%2B)
 ![OpenMP](https://img.shields.io/badge/OpenMP-Parallel-green)

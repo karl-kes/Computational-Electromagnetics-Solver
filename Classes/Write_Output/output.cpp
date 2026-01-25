@@ -7,7 +7,7 @@ void Output::initialize() const {
     std::filesystem::create_directories( base_path_ + "/B" );
 }
 
-std::string Output::file_name (Field_Type field, std::size_t time_step ) const {
+std::string Output::file_name ( Field_Type field, std::size_t time_step ) const {
     std::string prefix{ ( field == Field_Type::electric ) ? "/E/E" : "/B/B" };
     return base_path_ + prefix + std::to_string( time_step ) + ".bin";
 }
@@ -20,9 +20,9 @@ void Output::write_field( Grid const& grid, Field_Type field, double time_step )
         throw std::runtime_error{ "Failed to open file: " + path };
     }
 
-    std::size_t nx = grid.Nx() - 1;
-    std::size_t ny = grid.Ny() - 1;
-    std::size_t nz = grid.Nz() - 1;
+    std::size_t nx{ grid.Nx() - 1 };
+    std::size_t ny{ grid.Ny() - 1 };
+    std::size_t nz{ grid.Nz() - 1 };
 
     uint64_t dimensions[3] = {
         static_cast<uint64_t>( nx ),
