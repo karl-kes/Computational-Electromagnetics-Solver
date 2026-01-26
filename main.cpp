@@ -12,7 +12,7 @@
     ./render.py
 
     For Parallel (RECOMMENDED):
-    g++ -std=c++17 -O2 -fopenmp main.cpp Classes/Grid/*.cpp Classes/Source/*.cpp Classes/Write_Output/*.cpp -o main.exe
+    g++ -std=c++17 -O3 -march=native -fopenmp main.cpp Classes/Grid/*.cpp Classes/Source/*.cpp Classes/Write_Output/*.cpp -o main.exe
     ./main.exe
     ./render.py
 */
@@ -32,23 +32,24 @@ int main() {
     output.initialize();
 
     // Add sources:
-    grid.add_source( std::make_unique<Straight_Wire_X>(
-        1000.0,                          // amplitude
-        10.0,                            // frequency
-        config.Ny / 2,                  // y position
-        config.Nz / 2,                  // z position
-        config.Nx / 4,                  // x start
-        3 * config.Nx / 4               // x end
-    ) );
-
-    // grid.add_source( std::make_unique<Point_Source>(
-    //     100.0,
-    //     config.Nx / 2,
-    //     config.Ny / 2,
-    //     config.Nz / 2
+    // grid.add_source( std::make_unique<Straight_Wire_X>(
+    //     1000.0,                          // amplitude
+    //     10.0,                            // frequency
+    //     config.Ny / 2,                  // y position
+    //     config.Nz / 2,                  // z position
+    //     config.Nx / 4,                  // x start
+    //     3 * config.Nx / 4               // x end
     // ) );
+
+    grid.add_source( std::make_unique<Point_Source>(
+        100.0,
+        config.Nx / 2,
+        config.Ny / 2,
+        config.Nz / 2
+    ) );
     
     grid.apply_sources();
+    grid.step();
 
     // Track Energy:
     double initial_energy{ grid.total_energy() };
@@ -59,7 +60,7 @@ int main() {
     auto start_time{ std::chrono::high_resolution_clock::now() };
 
     for ( std::size_t curr_time{}; curr_time <= config.total_time; ++curr_time ) {
-        grid.apply_sources( curr_time );
+        // grid.apply_sources( curr_time );
         grid.step();
 
         max_energy = std::max( grid.total_energy(), max_energy );
@@ -76,7 +77,7 @@ int main() {
     auto duration{ std::chrono::duration_cast<std::chrono::milliseconds>( end_time - start_time ) };
 
     // Report results
-    double energy_drift{ ( initial_energy == 0 ) ? 0.0 : ( 100.0 * ( max_energy - initial_energy ) / initial_energy ) };
+    double energy_drift{ ( initial_energy == 0.0 ) ? 0.0 : ( 100.0 * ( max_energy - initial_energy ) / initial_energy ) };
 
     std::cout << "\n\n";
     std::cout << "Simulation Complete\n";

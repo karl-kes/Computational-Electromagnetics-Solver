@@ -1,7 +1,7 @@
 #include "grid.hpp"
 
 // Getters:
-// Dimensions
+// Dimensions:
 std::size_t Grid::Nx() const { return Nx_; }
 std::size_t Grid::Ny() const { return Ny_; }
 std::size_t Grid::Nz() const { return Nz_; }

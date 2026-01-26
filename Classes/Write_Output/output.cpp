@@ -38,7 +38,6 @@ void Output::write_field( Grid const& grid, Field field, double time_step ) cons
 
     for ( std::size_t z = 0; z < nz; ++z ) {
         buffer.clear();
-        
         for ( std::size_t y = 0; y < ny; ++y ) {
             for ( std::size_t x = 0; x < nx; ++x ) {
                 // Average to cell centers for visualization; deals with Yee staggering:

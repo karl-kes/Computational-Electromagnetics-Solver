@@ -6,7 +6,7 @@ void Straight_Wire_X::apply( Grid &grid, double time_step ) {
     double const current{ amplitude_ * std::sin( omega * time_step ) };
 
     for ( std::size_t x{ x_start_ }; x <= x_end_; ++x ) {
-        grid.Jx(x,y_,z_) += current;
+        grid.Jx(x,y_,z_) = current;
     }
 }
 
