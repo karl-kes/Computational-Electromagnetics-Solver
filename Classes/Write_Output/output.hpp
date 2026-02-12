@@ -14,7 +14,7 @@ public:
     { }
 
     // Writes field data as binary:
-    void write_field( Grid const &grid, Field const field, double const time_step ) const;
+    void write_field( Grid const &grid, double const time_step ) const;
 
     // Creates fresh directories by removing old data:
     void initialize() const {

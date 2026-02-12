@@ -39,38 +39,26 @@ private:
     // Curl Calculation:
     // Calculation flipped to fix Plotly left-hand rule default.
     [[nodiscard]] double curl_x(
-                    double const Y_0, double const Y_1,
-                    double const Z_0, double const Z_1) const
+                        double const Y_0, double const Y_1,
+                        double const Z_0, double const Z_1) const
                     { return ( Z_1 - Z_0 ) / dy() - ( Y_1 - Y_0 ) / dz(); }
 
     [[nodiscard]] double curl_y(
-                    double const X_0, double const X_1,
-                    double const Z_0, double const Z_1 ) const
+                        double const X_0, double const X_1,
+                        double const Z_0, double const Z_1 ) const
                     { return ( X_1 - X_0 ) / dz() - ( Z_1 - Z_0 ) / dx(); }
 
     [[nodiscard]] double curl_z(
-                    double const Y_0, double const Y_1,
-                    double const X_0, double const X_1 ) const 
+                        double const Y_0, double const Y_1,
+                        double const X_0, double const X_1 ) const 
                     { return ( Y_1 - Y_0 ) / dx() - ( X_1 - X_0 ) / dy(); }
 
     // Field Updates:
     void update_B();
     void update_E();
-
-    void print_progress( double const current, double const total ) const {
-        double const percent{ 100.0 * current / total };
-        std::cout << "\rProgress: " << percent << "%" << std::flush;
-    }
-
 public:
     // Constructor:
     explicit Grid( Simulation_Config const &config );
-
-    // Non-copyable and Non-movable:
-    Grid ( Grid const& ) = delete;
-    Grid &operator=( Grid const& ) = delete;
-    Grid( Grid&& ) = default;
-    Grid &operator=( Grid&& ) = default;
 
     // System Simulation:
     void step( Simulation_Config const &config, Output const &output, std::size_t const curr_time );
@@ -139,4 +127,10 @@ public:
 
     // Diagnostics:
     [[nodiscard]] double total_energy() const;
+    [[nodiscard]] double source_power() const;
+
+    void print_progress( double const current, double const total ) const {
+        double const percent{ 100.0 * current / total };
+        std::cout << "\rProgress: " << percent << "%" << std::flush;
+    }
 };

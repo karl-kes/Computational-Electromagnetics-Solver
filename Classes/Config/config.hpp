@@ -12,11 +12,12 @@
 #include <cmath>
 #include <stdexcept>
 
-struct Simulation_Config {
+class Simulation_Config {
+public:
     // Grid Dimensions:
-    std::size_t Nx{ 20 };
-    std::size_t Ny{ 20 };
-    std::size_t Nz{ 20 };
+    std::size_t Nx{ 100 };
+    std::size_t Ny{ 100 };
+    std::size_t Nz{ 100 };
     std::size_t size{ ( Nx + 1 ) * ( Ny + 1 ) * ( Nz + 1 ) };
 
     // Spatial Step Size:
@@ -30,11 +31,14 @@ struct Simulation_Config {
     double c{ 1.0 / ( std::sqrt ( mu * eps ) ) };
 
     // Time Stepping:
-    double cfl_factor{ 0.1 };
+    double cfl_factor{ 0.5 };
     double total_time{ 1000.0 };
     double dt{ cfl_factor / ( c * std::sqrt( 1.0 / (dx*dx) + 1.0 / (dy*dy) + 1.0 / (dz*dz) ) ) };
 
-    std::size_t output_interval() const { return total_time / 50; }
+    // Validation:
+    bool run_validation{ true };
+
+    std::size_t output_interval() const { return static_cast<std::size_t>( total_time / 50) ; }
 };
 
 enum class Field {

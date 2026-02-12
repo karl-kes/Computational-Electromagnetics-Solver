@@ -69,12 +69,6 @@ void Grid::update_E() {
 void Grid::step( Simulation_Config const &config, Output const &output, std::size_t const curr_time ) {
     update_B();
     update_E();
-
-    if ( ( curr_time % config.output_interval() ) == 0 ) {
-        output.write_field( *this, Field::ELECTRIC, curr_time );
-        output.write_field( *this, Field::MAGNETIC, curr_time );
-        print_progress( curr_time, config.total_time );
-    }
 }
 
 double Grid::field(
@@ -131,10 +125,9 @@ double Grid::total_energy() const {
     double energy{};
     double const dV{ dx() * dy() * dz() };
 
-    #pragma omp parallel for collapse( 2 ) reduction( +:energy )
+    #pragma omp parallel for collapse( 3 ) reduction( +:energy )
     for ( std::size_t z = 0; z < Nz(); ++z ) {
         for ( std::size_t y = 0; y < Ny(); ++y ) {
-            #pragma omp simd
             for ( std::size_t x = 0; x < Nx(); ++x ) {
                     double const E_sq{ Ex(x,y,z)*Ex(x,y,z) + Ey(x,y,z)*Ey(x,y,z) + Ez(x,y,z)*Ez(x,y,z) };
                     double const B_sq{ Bx(x,y,z)*Bx(x,y,z) + By(x,y,z)*By(x,y,z) + Bz(x,y,z)*Bz(x,y,z) };
@@ -144,4 +137,21 @@ double Grid::total_energy() const {
         }
     }
     return energy * dV;
+}
+
+double Grid::source_power() const {
+    double power{};
+    double const dV{ dx() * dy() * dz() };
+    
+    #pragma omp parallel for collapse( 3 ) reduction( +:power )
+    for ( std::size_t z = 0; z < Nz(); ++z ) {
+        for ( std::size_t y = 0; y < Ny(); ++y ) {
+            for ( std::size_t x = 0; x < Nx(); ++x ) {
+                power -= Jx(x,y,z) * Ex(x,y,z);
+                power -= Jy(x,y,z) * Ey(x,y,z);
+                power -= Jz(x,y,z) * Ez(x,y,z);
+            }
+        }
+    }
+    return power * dV;
 }

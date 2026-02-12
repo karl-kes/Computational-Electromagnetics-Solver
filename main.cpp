@@ -2,6 +2,8 @@
 #include "Classes/Grid/grid.hpp"
 #include "Classes/Source/source.hpp"
 #include "Classes/Write_Output/output.hpp"
+#include "Simulation.hpp"
+#include "Validation.hpp"
 
 /* 
     To compile and run.
@@ -18,62 +20,19 @@
 */
 
 int main() {
-    // Configure:
     Simulation_Config config{};
+    Simulation sim{ config };
 
-    // Initialize:
-    Grid grid( config );
-    Output output{ "output" };
-    output.initialize();
-
-    // Add sources:
-    grid.add_source( std::make_unique<Straight_Wire_X>(
-        100000.0,                          // amplitude
-        10.0,                            // frequency
-        config.Ny / 2,                  // y position
-        config.Nz / 2,                  // z position
-        config.Nx / 4,                  // x start
-        3 * config.Nx / 4               // x end
-    ) );
-
-    grid.add_source( std::make_unique<Point_Source>(
-        100.0,
-        config.Nx / 2,
-        config.Ny / 2,
-        config.Nz / 2
-    ) );
-    
-    grid.apply_sources();
-    grid.step( config, output, 0);
-
-    // Track Energy:
-    double const initial_energy{ grid.total_energy() };
-    double max_energy{ initial_energy };
-
-    // Run simulation and start timer:
-    std::size_t const output_interval{ config.output_interval() };
-    auto const start_time{ std::chrono::high_resolution_clock::now() };
-
-    // Simulation Loop:
-    for ( std::size_t curr_time{}; curr_time <= config.total_time; ++curr_time ) {
-        // grid.apply_sources( curr_time );
-        grid.step( config, output, curr_time );
-        max_energy = std::max( grid.total_energy(), max_energy );
+    // Validation:
+    if ( config.run_validation ) {
+        Plane_Wave_Test test{ config };
+        Validation_Result result{ test.run() };
+        test.print_report( result );
     }
 
-    // End Timer:
-    auto const end_time{ std::chrono::high_resolution_clock::now() };
-    auto const duration{ std::chrono::duration_cast<std::chrono::milliseconds>( end_time - start_time ) };
-
-    // Report results
-    double const energy_drift{ ( initial_energy == 0.0 ) ? 0.0 : ( 100.0 * ( max_energy - initial_energy ) / initial_energy ) };
-
-    std::cout << "\n\n";
-    std::cout << "Simulation Complete\n";
-    std::cout << "-------------------\n";
-    std::cout << "Duration: " << duration.count() << " ms\n";
-    std::cout << "Physical time: " << config.total_time * grid.dt() << " s\n";
-    std::cout << "Max energy drift: " << energy_drift << "%\n" << std::endl;
+    // Simulation:
+    sim.initialize();
+    sim.run();
 
     return 0;
 }

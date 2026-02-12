@@ -1,4 +1,4 @@
-# Computational Electromagnetics Solver
+# Finite-Difference Maxwell Solver
 
 A high-performance Finite-Difference Time-Domain solver which simulates Maxwell's equations in 3D. Implemented in C++ with OpenMP parallelization and interactive Plotly visualization.
 

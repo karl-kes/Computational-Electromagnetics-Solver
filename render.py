@@ -12,10 +12,13 @@ def load_binary_volume_full(file_path):
         expected_size = int(nx * ny * nz * 4)
         data = np.fromfile(f, dtype=np.float64, count=expected_size)
     
-    grid = data.reshape((nz, ny, nx, 4))
+    grid = data.reshape((int(nz), int(ny), int(nx), 4))
+    
+    grid = np.transpose(grid, (2, 1, 0, 3))
+    
     mag = grid[:, :, :, 3]
     vectors = grid[:, :, :, :3]
-    return mag, vectors, (nx, ny, nz)
+    return mag, vectors, (int(nx), int(ny), int(nz))
 
 # 1. Load E and B files
 e_files = sorted(glob.glob("output/E/E*.bin"), 
@@ -39,7 +42,9 @@ for ef, bf in zip(e_files, b_files):
         b_vector_list.append(b_vec)
 
 nx, ny, nz = shape
-z, y, x = np.mgrid[0:nz, 0:ny, 0:nx]
+
+# Create meshgrid in (x, y, z) order to match transposed data
+x, y, z = np.mgrid[0:nx, 0:ny, 0:nz]
 
 step = 1
 x_sub = x[::step, ::step, ::step]
@@ -63,17 +68,18 @@ for i in range(len(e_volume_list)):
     e_vol, e_vec = e_volume_list[i], e_vector_list[i]
     b_vol, b_vec = b_volume_list[i], b_vector_list[i]
     
+    # Extract vector components
     e_Fx = e_vec[::step, ::step, ::step, 0].flatten()
     e_Fy = e_vec[::step, ::step, ::step, 1].flatten()
     e_Fz = e_vec[::step, ::step, ::step, 2].flatten()
     e_mag_sub = np.sqrt(e_Fx**2 + e_Fy**2 + e_Fz**2)
-    e_mask = (e_mag_sub > e_vec_max * 0.1).flatten()
+    e_mask = (e_mag_sub > e_vec_max * 0.1)
     
     b_Fx = b_vec[::step, ::step, ::step, 0].flatten()
     b_Fy = b_vec[::step, ::step, ::step, 1].flatten()
     b_Fz = b_vec[::step, ::step, ::step, 2].flatten()
     b_mag_sub = np.sqrt(b_Fx**2 + b_Fy**2 + b_Fz**2)
-    b_mask = (b_mag_sub > b_vec_max * 0.1).flatten()
+    b_mask = (b_mag_sub > b_vec_max * 0.1)
     
     frames.append(go.Frame(
         data=[
@@ -119,6 +125,7 @@ start_idx = next((i for i, v in enumerate(e_volume_list) if v.max() > 0.001), 0)
 e_vol, e_vec = e_volume_list[start_idx], e_vector_list[start_idx]
 b_vol, b_vec = b_volume_list[start_idx], b_vector_list[start_idx]
 
+# Extract vector components
 e_Fx = e_vec[::step, ::step, ::step, 0].flatten()
 e_Fy = e_vec[::step, ::step, ::step, 1].flatten()
 e_Fz = e_vec[::step, ::step, ::step, 2].flatten()
