@@ -1,9 +1,17 @@
 #pragma once
 
+#include "../Config/config.hpp"
+
 #include <memory>
 #include <cmath>
 
-#include "../Config/config.hpp"
+#if defined(__GNUC__) || defined(__clang__)
+    #define RESTRICT __restrict__
+#elif defined(_MSC_VER)
+    #define RESTRICT __restrict
+#else
+    #define RESTRICT
+#endif
 
 class PML {
 private:
@@ -77,12 +85,12 @@ public:
     explicit PML( Simulation_Config const &config );
 
     // Apply PML corrections after standard update:
-    void update_B_psi( double *Ex, double *Ey, double *Ez,
-                       double *Bx, double *By, double *Bz,
+    void update_B_psi( double* RESTRICT Ex, double* RESTRICT Ey, double* RESTRICT Ez,
+                       double* RESTRICT Bx, double* RESTRICT By, double* RESTRICT Bz,
                        double const dt, double const dx, double const dy, double const dz );
 
-    void update_E_psi( double *Ex, double *Ey, double *Ez,
-                       double *Bx, double *By, double *Bz,
+    void update_E_psi( double* RESTRICT Ex, double* RESTRICT Ey, double* RESTRICT Ez,
+                       double* RESTRICT Bx, double* RESTRICT By, double* RESTRICT Bz,
                        double const dt, double const dx, double const dy, double const dz,
                        double const c_sq );
 

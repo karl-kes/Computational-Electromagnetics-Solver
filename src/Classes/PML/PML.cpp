@@ -1,13 +1,5 @@
 #include "PML.hpp"
 
-#if defined(__GNUC__) || defined(__clang__)
-    #define RESTRICT __restrict__
-#elif defined(_MSC_VER)
-    #define RESTRICT __restrict
-#else
-    #define RESTRICT
-#endif
-
 PML::PML( Simulation_Config const &config )
 : thickness_{ config.use_pml ? config.pml_thickness : 0 }
 , Nx_{ config.Nx + 1 }
