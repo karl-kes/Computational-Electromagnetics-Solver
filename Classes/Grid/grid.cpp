@@ -1,5 +1,27 @@
 #include "grid.hpp"
 
+Grid::Grid( Simulation_Config const &config )
+: Nx_{ config.Nx + 1 }
+, Ny_{ config.Ny + 1 }
+, Nz_{ config.Nz + 1 }
+, dx_{ config.dx }
+, dy_{ config.dy }
+, dz_{ config.dz }
+, eps_{ config.eps }
+, mu_{ config.mu }
+, c_{ config.c }
+, c_sq_{ config.c * config.c }
+, dt_{ config.dt }
+, pml_{ config } {
+    auto allocate = [size = config.size]() {
+        return std::make_unique<double[]>( size );
+    };
+
+    Ex_ = allocate(); Ey_ = allocate(); Ez_ = allocate();
+    Bx_ = allocate(); By_ = allocate(); Bz_ = allocate();
+    Jx_ = allocate(); Jy_ = allocate(); Jz_ = allocate();
+}
+
 void Grid::add_source( std::unique_ptr<Source> source ) {
     sources_.push_back( std::move( source ) );
 }
@@ -34,6 +56,9 @@ void Grid::update_B() {
             }
         }
     }
+    pml_.update_B_psi( Ex_.get(), Ey_.get(), Ez_.get(),
+                       Bx_.get(), By_.get(), Bz_.get(),
+                       dt(), dx(), dy(), dz() );
 }
 
 void Grid::update_E() {
@@ -64,6 +89,9 @@ void Grid::update_E() {
             }
         }
     }
+    pml_.update_E_psi( Ex_.get(), Ey_.get(), Ez_.get(),
+                       Bx_.get(), By_.get(), Bz_.get(),
+                       dt(), dx(), dy(), dz(), c_sq() );
 }
 
 void Grid::step( Simulation_Config const &config, Output const &output, std::size_t const curr_time ) {

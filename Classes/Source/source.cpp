@@ -13,9 +13,9 @@ void Straight_Wire_X::apply( Grid &grid, double const time_step ) {
 void Point_Source::apply( Grid &grid, double const time_step ) {
     ( void )time_step;
 
-    grid.Jx(x_,y_,z_) += value_;
-    grid.Jy(x_,y_,z_) += value_;
-    grid.Jz(x_,y_,z_) += value_;
+    grid.Jx(x_,y_,z_) = value_;
+    grid.Jy(x_,y_,z_) = value_;
+    grid.Jz(x_,y_,z_) = value_;
 }
 
 void Gaussian_Pulse::apply( Grid& grid, double const time_step ) {

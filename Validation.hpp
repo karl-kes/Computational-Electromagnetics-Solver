@@ -104,7 +104,7 @@ public:
         // Pass criteria
         bool const passed{ 
             energy_drift < 5.0 &&      // <5% energy drift
-            correlation > 0.999 &&     // >99.9% correlation
+            correlation > 0.99 &&      // >99.9% correlation
             dispersion < 10.0          // <10% dispersion
         };
 

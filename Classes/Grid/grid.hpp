@@ -9,6 +9,7 @@
 #include "../Config/config.hpp"
 #include "../Source/source.hpp"
 #include "../Write_Output/output.hpp"
+#include "../PML/PML.hpp"
 
 class Grid {
 private:
@@ -31,6 +32,9 @@ private:
 
     // Sources:
     std::vector<std::unique_ptr<Source>> sources_;
+
+    // PML Absorbing Boundary:
+    PML pml_;
 
     // Private Methods:
     // Finds flattened 1D index given 3D space:
@@ -128,6 +132,8 @@ public:
     // Diagnostics:
     [[nodiscard]] double total_energy() const;
     [[nodiscard]] double source_power() const;
+
+    [[nodiscard]] PML const &pml() const { return pml_; }
 
     void print_progress( double const current, double const total ) const {
         double const percent{ 100.0 * current / total };
