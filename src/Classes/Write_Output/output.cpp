@@ -47,7 +47,7 @@ void Output::write_field( Grid const& grid, double const time_step ) const {
     file_E.close();
 
     // Magnetic:
-    std::string path_B = file_name( Field::MAGNETIC, time_step );
+    std::string path_B{ file_name( Field::MAGNETIC, time_step ) };
     std::ofstream file_B( path_B, std::ios::binary | std::ios::out );
     
     if ( !file_B.is_open() ) {

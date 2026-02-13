@@ -190,14 +190,26 @@ double Grid::total_energy() const {
     double energy{};
     double const dV{ dx() * dy() * dz() };
 
+    double* RESTRICT Ex{ Ex_.get() };
+    double* RESTRICT Ey{ Ey_.get() };
+    double* RESTRICT Ez{ Ez_.get() };
+    double* RESTRICT Bx{ Bx_.get() };
+    double* RESTRICT By{ By_.get() };
+    double* RESTRICT Bz{ Bz_.get() };
+
+    double const inv_mu{ 1.0 / mu() };
+    double const eps_local{ eps() };
+
     #pragma omp parallel for collapse( 3 ) reduction( +:energy )
     for ( std::size_t z = 0; z < Nz(); ++z ) {
         for ( std::size_t y = 0; y < Ny(); ++y ) {
             for ( std::size_t x = 0; x < Nx(); ++x ) {
-                    double const E_sq{ Ex(x,y,z)*Ex(x,y,z) + Ey(x,y,z)*Ey(x,y,z) + Ez(x,y,z)*Ez(x,y,z) };
-                    double const B_sq{ Bx(x,y,z)*Bx(x,y,z) + By(x,y,z)*By(x,y,z) + Bz(x,y,z)*Bz(x,y,z) };
+                std::size_t const i{ idx(x,y,z) };
+                
+                double const E_sq{ Ex[i]*Ex[i] + Ey[i]*Ey[i] + Ez[i]*Ez[i] };
+                double const B_sq{ Bx[i]*Bx[i] + By[i]*By[i] + Bz[i]*Bz[i] };
 
-                    energy += 0.5 * ( eps() * E_sq + B_sq / mu() );
+                energy += 0.5 * ( eps_local * E_sq + B_sq * inv_mu );
             }
         }
     }
@@ -207,14 +219,23 @@ double Grid::total_energy() const {
 double Grid::source_power() const {
     double power{};
     double const dV{ dx() * dy() * dz() };
+
+    double* RESTRICT Ex{ Ex_.get() };
+    double* RESTRICT Ey{ Ey_.get() };
+    double* RESTRICT Ez{ Ez_.get() };
+    double* RESTRICT Jx{ Jx_.get() };
+    double* RESTRICT Jy{ Jy_.get() };
+    double* RESTRICT Jz{ Jz_.get() };
     
     #pragma omp parallel for collapse( 3 ) reduction( +:power )
     for ( std::size_t z = 0; z < Nz(); ++z ) {
         for ( std::size_t y = 0; y < Ny(); ++y ) {
             for ( std::size_t x = 0; x < Nx(); ++x ) {
-                power -= Jx(x,y,z) * Ex(x,y,z);
-                power -= Jy(x,y,z) * Ey(x,y,z);
-                power -= Jz(x,y,z) * Ez(x,y,z);
+                std::size_t const i{ idx(x,y,z) };
+
+                power -= Jx[i] * Ex[i];
+                power -= Jy[i] * Ey[i];
+                power -= Jz[i] * Ez[i];
             }
         }
     }
