@@ -71,6 +71,16 @@ fetchcontent_declare(
 )
 fetchcontent_makeavailable(xpu)
 
+# Header-only framework and its usage requirements:
+
+add_library(kestrel INTERFACE)
+add_library(kestrel::kestrel ALIAS kestrel)
+target_include_directories(kestrel INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+target_compile_features(kestrel INTERFACE cxx_std_23)
+target_link_libraries(kestrel INTERFACE xpu::xpu)
+
 # Compile .cu files as ordinary C++ when the CPU backend is selected.
 
 function(kestrel_configure_sources)
@@ -83,6 +93,12 @@ function(kestrel_configure_sources)
         )
     endif()
 endfunction()
+
+# Framework development executable:
+
+kestrel_configure_sources("${CMAKE_CURRENT_SOURCE_DIR}/src/main.cu")
+add_executable(kestrel-main src/main.cu)
+target_link_libraries(kestrel-main PRIVATE kestrel::kestrel)
 
 # Build modes:
 

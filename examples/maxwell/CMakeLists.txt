@@ -11,7 +11,7 @@ kestrel_configure_sources(${MAXWELL_CORE_SOURCES})
 
 add_library(kestrel-maxwell-core STATIC ${MAXWELL_CORE_SOURCES})
 target_include_directories(kestrel-maxwell-core PUBLIC "${MAXWELL_SOURCE_DIR}")
-target_link_libraries(kestrel-maxwell-core PUBLIC xpu::xpu)
+target_link_libraries(kestrel-maxwell-core PUBLIC kestrel::kestrel)
 
 set(MAXWELL_OPT_FLAGS
     -O3
@@ -206,7 +206,7 @@ endif()
 
 add_library(kestrel-maxwell-core-serial STATIC ${MAXWELL_CORE_SOURCES})
 target_include_directories(kestrel-maxwell-core-serial PUBLIC "${MAXWELL_SOURCE_DIR}")
-target_link_libraries(kestrel-maxwell-core-serial PUBLIC xpu::xpu)
+target_link_libraries(kestrel-maxwell-core-serial PUBLIC kestrel::kestrel)
 
 if(IS_DEBUG)
     if(KESTREL_CUDA)

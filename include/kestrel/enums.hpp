@@ -1,8 +1,9 @@
 #pragma once
 
-#include "concepts.hpp"
 #include <cstddef>
 #include <utility>
+
+#include <kestrel/concepts.hpp>
 
 namespace kestrel {
 
