@@ -2,7 +2,9 @@
 
 A C++23 framework in development for GPU-accelerated three-dimensional finite-difference solvers. Kestrel uses XPU for dual CPU/CUDA backends; HIP support is planned.
 
-The existing Maxwell FDTD solver now lives in `examples/maxwell` and serves as the first reference application while the generic Grid and Field APIs are developed.
+The Maxwell FDTD solver in `examples/maxwell` and the [3D heat solver](examples/heat/README.md)
+in `examples/heat` serve as reference applications while the generic Grid and
+Field APIs are developed. Both retain their existing solver and storage classes.
 
 ![C++](https://img.shields.io/badge/C++-23-blue?logo=c%2B%2B)
 ![OpenMP](https://img.shields.io/badge/OpenMP-Parallel-green)
@@ -79,6 +81,19 @@ python ../../../examples/maxwell/render.py  # optional visualization
 
 Set `KESTREL_BUILD_EXAMPLES=OFF` to configure Kestrel without its examples.
 
+### Heat example
+
+The heat example supports CPU/OpenMP and CUDA execution, insulated boundaries,
+Gaussian/cosine initial conditions, and VTK output. After building:
+
+```bash
+cd build-release/examples/heat
+OMP_NUM_THREADS=4 ./kestrel-heat --nx 32 --ny 24 --nz 16 --steps 100
+```
+
+Set `KESTREL_HEAT_PRECISION=double` for double precision (default: `float`).
+See [the heat example documentation](examples/heat/README.md) for testing and output.
+
 ### Build Scripts
 
 The Linux/WSL2 scripts create their build directories on first run and perform
@@ -106,7 +121,7 @@ Linux / WSL2:
 cmake -S . -B build-test \
     -DCMAKE_BUILD_TYPE=Test \
     -DCMAKE_CXX_COMPILER=g++-15
-cmake --build build-test --target kestrel-maxwell-tests -j
+cmake --build build-test -j
 ctest --test-dir build-test --output-on-failure
 
 # or run individual Maxwell suites:
@@ -137,6 +152,7 @@ Derived: `dt` (CFL-limited), `pml_thickness` (from grid volume, clamped to [4, 2
 ```text
 ├── CMakeLists.txt                         # Shared toolchain, XPU, and backend setup
 ├── examples/
+│   ├── heat/                              # 3D heat solver, tests, and build/run guide
 │   └── maxwell/
 │       ├── CMakeLists.txt                 # Maxwell targets
 │       ├── config.cfg                     # Runtime parameters

@@ -48,6 +48,7 @@ core.*
 # Generated simulation and benchmark data
 /output/
 /examples/*/output/
+/examples/heat/out/
 /examples/*/benchmark/results/
 *.csv
 *.rrd

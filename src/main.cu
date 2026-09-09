@@ -1,6 +1,7 @@
 #include <kestrel/field.hpp>
 #include <kestrel/grid.hpp>
 #include <kestrel/precision.hpp>
+#include <kestrel/timer.hpp>
 
 auto main() -> int {
   constexpr kestrel::grid<3> geometry{

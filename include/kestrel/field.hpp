@@ -9,7 +9,7 @@ namespace kestrel {
 
 template <arithmetic T, std::size_t Components>
 struct field_view {
-  static_assert(Components > 0);
+  static_assert(Components > 0, "A field must have at least one component.");
 
   xpu::soa_view<T, Components> data;
 };

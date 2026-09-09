@@ -141,6 +141,7 @@ check_ipo_supported(RESULT ipo_supported OUTPUT ipo_output LANGUAGES CXX)
 
 if(KESTREL_BUILD_EXAMPLES)
     add_subdirectory(examples/maxwell)
+    add_subdirectory(examples/heat)
 endif()
 
 # Status:
